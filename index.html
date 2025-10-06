@@ -169,7 +169,15 @@
         // --- Firebase Functions ---
         async function initializeFirebase() {
             try {
-                const firebaseConfig = JSON.parse(typeof __firebase_config !== 'undefined' ? __firebase_config : '{}');
+                const firebaseConfig = {
+  apiKey: "AIzaSyAfatIGx88HP1fH0_EGTr_zHpvNa1Rcg7k",
+  authDomain: "laylahomeschool-77ac4.firebaseapp.com",
+  projectId: "laylahomeschool-77ac4",
+  storageBucket: "laylahomeschool-77ac4.firebasestorage.app",
+  messagingSenderId: "491842629315",
+  appId: "1:491842629315:web:8644c66d1cde1b734fbc76",
+  measurementId: "G-FXT963GPZ9"
+};
                 appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
                 const app = initializeApp(firebaseConfig);
                 db = getFirestore(app);
