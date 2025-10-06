@@ -127,265 +127,254 @@
     </div>
 
     <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, signInAnonymously, onAuthStateChanged, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, doc, setDoc, getDoc, collection } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
-        
-        // --- App State ---
-        let db, auth, userId, appId;
-        let progressData = {};
-        const subjectData = { /* Subject data from previous version remains the same */
-            reading: {
-                title: 'Reading Fun!',
-                activities: [
-                    { title: 'Rhyming Words', type: 'quiz', instructions: 'Choose the word that rhymes with the big word!', questions: [ { q: 'cat', options: ['dog', 'hat', 'sun'], a: 'hat' }, { q: 'bee', options: ['tree', 'sky', 'bug'], a: 'tree' }, { q: 'mop', options: ['run', 'top', 'fan'], a: 'top' }, { q: 'pen', options: ['hen', 'pig', 'box'], a: 'hen' } ]},
-                    { title: 'Sight Word Flashcards', type: 'flashcards', words: ['the', 'a', 'and', 'is', 'it', 'in', 'I', 'you', 'to', 'go']}
-                ]
-            },
-            math: {
-                title: 'Math Magic!',
-                activities: [
-                    { title: 'Addition Challenge', type: 'math_quiz', operator: '+', range: 10 },
-                    { title: 'Subtraction Sprint', type: 'math_quiz', operator: '-', range: 10 },
-                    { title: 'What Time Is It?', type: 'clock' }
-                ]
-            },
-            science: {
-                title: 'Science Lab!',
-                activities: [
-                    { title: 'Animal Parts', type: 'quiz', instructions: 'What part of the animal is this?', questions: [ { q: 'Head', options: ['Tail', 'Leg', 'Head'], a: 'Head' }, { q: 'Legs', options: ['Legs', 'Eyes', 'Ears'], a: 'Legs' }, { q: 'Tail', options: ['Nose', 'Tail', 'Paws'], a: 'Tail' }]},
-                    { title: 'Day & Night', type: 'interactive_sky' }
-                ]
-            },
-            'social-studies': {
-                title: 'Explore Our World!',
-                activities: [
-                    { title: 'Map of South Carolina', type: 'map', instructions: 'Press the buttons to learn a fun fact about each city!' },
-                    { title: 'Community Helpers', type: 'quiz', instructions: 'Choose the best answer!', questions: [ { q: 'Who helps us when we are sick?', options: ['Firefighter', 'Doctor', 'Teacher'], a: 'Doctor' }, { q: 'Who puts out fires?', options: ['Police Officer', 'Doctor', 'Firefighter'], a: 'Firefighter' }, { q: 'Who helps us learn new things?', options: ['Teacher', 'Doctor', 'Firefighter'], a: 'Teacher' } ]}
-                ]
-            }
-        };
-
-        // --- Firebase Functions ---
-        async function initializeFirebase() {
-            try {
-                const firebaseConfig = {
-  apiKey: "AIzaSyAfatIGx88HP1fH0_EGTr_zHpvNa1Rcg7k",
-  authDomain: "laylahomeschool-77ac4.firebaseapp.com",
-  projectId: "laylahomeschool-77ac4",
-  storageBucket: "laylahomeschool-77ac4.firebasestorage.app",
-  messagingSenderId: "491842629315" 
-  appId: "1:491842629315:web:8644c66d1cde1b734fbc76",
-  measurementId: "G-FXT963GPZ9"
-};
-                appId: "1:491842629315:web:8644c66d1cde1b734fbc76",
-                const app = initializeApp(firebaseConfig);
-                db = getFirestore(app);
-                auth = getAuth(app);
-
-                onAuthStateChanged(auth, async (user) => {
-                    if (user) {
-                        userId = user.uid;
-                        document.getElementById('auth-status').innerHTML = `<p>Welcome Layla! | Tracking ID for remote progress: <span class="font-bold">${userId}</span></p>`;
-                        await loadProgress();
-                    } else {
-                        // If no user, sign in. Use custom token if available, else anonymously.
-                        if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
-                            await signInWithCustomToken(auth, __initial_auth_token);
-                        } else {
-                            await signInAnonymously(auth);
-                        }
-                    }
-                });
-            } catch (error) {
-                console.error("Firebase initialization failed:", error);
-                document.getElementById('auth-status').innerText = "Could not connect to progress tracking.";
-            }
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+    import { getAuth, signInAnonymously, onAuthStateChanged, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+    import { getFirestore, doc, setDoc, getDoc, collection } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+    
+    // --- App State ---
+    let db, auth, userId, appId;
+    let progressData = {};
+    const subjectData = { /* Subject data from previous version remains the same */
+        reading: {
+            title: 'Reading Fun!',
+            activities: [
+                { title: 'Rhyming Words', type: 'quiz', instructions: 'Choose the word that rhymes with the big word!', questions: [ { q: 'cat', options: ['dog', 'hat', 'sun'], a: 'hat' }, { q: 'bee', options: ['tree', 'sky', 'bug'], a: 'tree' }, { q: 'mop', options: ['run', 'top', 'fan'], a: 'top' }, { q: 'pen', options: ['hen', 'pig', 'box'], a: 'hen' } ]},
+                { title: 'Sight Word Flashcards', type: 'flashcards', words: ['the', 'a', 'and', 'is', 'it', 'in', 'I', 'you', 'to', 'go']}
+            ]
+        },
+        math: {
+            title: 'Math Magic!',
+            activities: [
+                { title: 'Addition Challenge', type: 'math_quiz', operator: '+', range: 10 },
+                { title: 'Subtraction Sprint', type: 'math_quiz', operator: '-', range: 10 },
+                { title: 'What Time Is It?', type: 'clock' }
+            ]
+        },
+        science: {
+            title: 'Science Lab!',
+            activities: [
+                { title: 'Animal Parts', type: 'quiz', instructions: 'What part of the animal is this?', questions: [ { q: 'Head', options: ['Tail', 'Leg', 'Head'], a: 'Head' }, { q: 'Legs', options: ['Legs', 'Eyes', 'Ears'], a: 'Legs' }, { q: 'Tail', options: ['Nose', 'Tail', 'Paws'], a: 'Tail' }]},
+                { title: 'Day & Night', type: 'interactive_sky' }
+            ]
+        },
+        'social-studies': {
+            title: 'Explore Our World!',
+            activities: [
+                { title: 'Map of South Carolina', type: 'map', instructions: 'Press the buttons to learn a fun fact about each city!' },
+                { title: 'Community Helpers', type: 'quiz', instructions: 'Choose the best answer!', questions: [ { q: 'Who helps us when we are sick?', options: ['Firefighter', 'Doctor', 'Teacher'], a: 'Doctor' }, { q: 'Who puts out fires?', options: ['Police Officer', 'Doctor', 'Firefighter'], a: 'Firefighter' }, { q: 'Who helps us learn new things?', options: ['Teacher', 'Doctor', 'Firefighter'], a: 'Teacher' } ]}
+            ]
         }
+    };
 
-        async function saveProgress(subject, activityTitle, data) {
-            if (!userId) return;
-            progressData[subject] = progressData[subject] || {};
-            progressData[subject][activityTitle] = data;
-            
-            const progressRef = doc(db, `artifacts/${appId}/users/${userId}/progress`, subject);
-            try {
-                await setDoc(progressRef, { [activityTitle]: data }, { merge: true });
-                updateDashboard();
-            } catch(e) {
-                console.error("Error saving progress: ", e);
-            }
-        }
+    // --- Firebase Configuration ---
+    // This now contains YOUR unique keys
+    const firebaseConfig = {
+      apiKey: "AIzaSyAfatIGx88HP1fH0_EGTr_zHpvNa1Rcg7k",
+      authDomain: "laylahomeschool-77ac4.firebaseapp.com",
+      projectId: "laylahomeschool-77ac4",
+      storageBucket: "laylahomeschool-77ac4.firebasestorage.app",
+      messagingSenderId: "491842629315",
+      appId: "1:491842629315:web:8644c66d1cde1b734fbc76"
+    };
+    appId = "laylahomeschool-77ac4";
 
-        async function loadProgress() {
-            if (!userId) return;
-            const subjects = Object.keys(subjectData);
-            for (const subject of subjects) {
-                const progressRef = doc(db, `artifacts/${appId}/users/${userId}/progress`, subject);
-                const docSnap = await getDoc(progressRef);
-                if (docSnap.exists()) {
-                    progressData[subject] = { ...progressData[subject], ...docSnap.data() };
-                }
-            }
-            updateDashboard();
-        }
 
-        // --- UI Functions ---
-        function updateDashboard() {
-             Object.keys(subjectData).forEach(subjectKey => {
-                const subject = subjectData[subjectKey];
-                const subjectProgress = progressData[subjectKey] || {};
-                const totalActivities = subject.activities.length;
-                const completedActivities = subject.activities.filter(a => subjectProgress[a.title]?.completed).length;
+    // --- Firebase Initialization & Functions ---
+    try {
+        const app = initializeApp(firebaseConfig);
+        db = getFirestore(app);
+        auth = getAuth(app);
 
-                const card = document.getElementById(`${subjectKey.replace(/\s/g, '-')}-card`);
-                if (totalActivities > 0 && completedActivities === totalActivities) {
-                    card.classList.add('completed');
-                } else {
-                    card.classList.remove('completed');
-                }
-            });
-        }
-
-        function openModal(subjectKey) {
-            const subject = subjectData[subjectKey];
-            const modalBody = document.getElementById('modal-body');
-            let content = `<h2 class="tv-text-4xl font-bold text-center mb-8">${subject.title}</h2>`;
-            
-            subject.activities.forEach(activity => {
-                const activityProgress = progressData[subjectKey]?.[activity.title] || {};
-                const isCompleted = activityProgress.completed;
-                content += `<div class="bg-gray-100 p-6 rounded-2xl mb-8 ${isCompleted ? 'border-4 border-green-500' : ''}">`;
-                content += `<h3 class="tv-text-2xl font-bold mb-4">${activity.title} ${isCompleted ? '✅' : ''}</h3>`;
-
-                switch (activity.type) {
-                    case 'quiz':
-                        content += `<p class="tv-text-xl mb-4">${activity.instructions}</p>`;
-                        activity.questions.forEach((q, index) => {
-                            const uniqueId = `${subjectKey}-${activity.title.replace(/\s/g, '')}-${index}`;
-                            content += `<div class="mb-4 p-4 bg-white rounded-lg shadow-sm" id="${uniqueId}">`;
-                            content += `<p class="tv-text-2xl font-bold mb-3">${q.q}</p>`;
-                            content += `<div class="grid grid-cols-1 gap-3">`;
-                            q.options.forEach(opt => {
-                                content += `<button onclick="window.checkAnswer(this, '${opt.replace(/'/g, "\\'")}', '${q.a.replace(/'/g, "\\'")}', '${uniqueId}', '${subjectKey}', '${activity.title}')" class="w-full text-left p-4 tv-text-xl bg-sky-200 hover:bg-sky-300 text-sky-800 font-bold rounded-lg transition">${opt}</button>`;
-                            });
-                            content += `</div></div>`;
-                        });
-                        break;
-                    // ... other cases for flashcards, math_quiz etc. adapted for TV
-                     case 'math_quiz':
-                         content += `<div class="text-center" id="math-game">
-                            <p class="tv-text-4xl mb-6"><span id="num1"></span> ${activity.operator} <span id="num2"></span> = ?</p>
-                            <input type="number" id="math-answer" class="tv-text-3xl p-4 border-4 border-gray-300 rounded-lg text-center w-48">
-                            <button id="check-math" class="ml-4 tv-text-2xl bg-green-500 hover:bg-green-600 text-white font-bold py-4 px-8 rounded-lg">Check</button>
-                            <p id="math-feedback" class="mt-6 tv-text-2xl font-bold h-8"></p>
-                         </div>`;
-                         setTimeout(() => setupMathGame(activity.operator, activity.range, subjectKey, activity.title), 0);
-                         break;
-                    case 'map':
-                         content += `<p class="tv-text-xl text-center mb-4">${activity.instructions}</p>
-                            <div class="p-4 rounded-lg flex flex-col items-center gap-6">
-                               <button class="p-5 tv-text-xl bg-red-500 text-white rounded-lg shadow-lg w-1/2" onclick="alert('Columbia is the state capital!')">Columbia</button>
-                               <button class="p-5 tv-text-xl bg-blue-500 text-white rounded-lg shadow-lg w-1/2" onclick="alert('Charleston is a beautiful city on the coast!')">Charleston</button>
-                               <button class="p-5 tv-text-xl bg-green-500 text-white rounded-lg shadow-lg w-1/2" onclick="alert('Greenville is in the foothills of the mountains!')">Greenville</button>
-                            </div>`;
-                         setTimeout(() => saveProgress(subjectKey, activity.title, { completed: true }), 100);
-                         break;
-
-                }
-                content += `</div>`;
-            });
-            modalBody.innerHTML = content;
-            document.getElementById('activity-modal').style.display = 'flex';
-        }
-        
-        // --- Global Interactive Functions ---
-        window.checkAnswer = (button, selectedAnswer, correctAnswer, quizId, subjectKey, activityTitle) => {
-            const parent = document.getElementById(quizId);
-            const buttons = parent.querySelectorAll('button');
-            buttons.forEach(b => b.disabled = true);
-
-            if (selectedAnswer === correctAnswer) {
-                button.classList.remove('bg-sky-200');
-                button.classList.add('bg-green-500', 'text-white');
+        onAuthStateChanged(auth, async (user) => {
+            if (user) {
+                userId = user.uid;
+                document.getElementById('auth-status').innerHTML = `<p>Welcome Layla! | Tracking ID: <span class="font-bold">${userId}</span></p>`;
+                await loadProgress();
             } else {
-                button.classList.remove('bg-sky-200');
-                button.classList.add('bg-red-500', 'text-white');
+                // For live website, we must use signInAnonymously
+                await signInAnonymously(auth);
             }
-            
-            // Check if all questions for this activity are answered and save progress
-            const allQuizParents = Array.from(document.querySelectorAll(`[id^="${subjectKey}-${activityTitle.replace(/\s/g, '')}"]`));
-            const allAnswered = allQuizParents.every(p => p.querySelector('button:disabled'));
-            if(allAnswered) {
-                const correctCount = allQuizParents.filter(p => p.querySelector('.bg-green-500')).length;
-                saveProgress(subjectKey, activityTitle, { completed: true, score: correctCount, total: allQuizParents.length });
+        });
+    } catch (error) {
+        console.error("Firebase initialization failed:", error);
+        document.getElementById('auth-status').innerText = "Could not connect to progress tracking.";
+    }
+    
+
+    async function saveProgress(subject, activityTitle, data) {
+        if (!userId) return;
+        progressData[subject] = progressData[subject] || {};
+        progressData[subject][activityTitle] = data;
+        
+        const progressRef = doc(db, `artifacts/${appId}/users/${userId}/progress`, subject);
+        try {
+            await setDoc(progressRef, { [activityTitle]: data }, { merge: true });
+            updateDashboard();
+        } catch(e) {
+            console.error("Error saving progress: ", e);
+        }
+    }
+
+    async function loadProgress() {
+        if (!userId) return;
+        const subjects = Object.keys(subjectData);
+        for (const subject of subjects) {
+            const progressRef = doc(db, `artifacts/${appId}/users/${userId}/progress`, subject);
+            const docSnap = await getDoc(progressRef);
+            if (docSnap.exists()) {
+                progressData[subject] = { ...progressData[subject], ...docSnap.data() };
             }
+        }
+        updateDashboard();
+    }
+
+    // --- UI Functions ---
+    function updateDashboard() {
+         Object.keys(subjectData).forEach(subjectKey => {
+            const subject = subjectData[subjectKey];
+            const subjectProgress = progressData[subjectKey] || {};
+            const totalActivities = subject.activities.length;
+            const completedActivities = subject.activities.filter(a => subjectProgress[a.title]?.completed).length;
+
+            const card = document.getElementById(`${subjectKey.replace(/\s/g, '-')}-card`);
+            if (totalActivities > 0 && completedActivities === totalActivities) {
+                card.classList.add('completed');
+            } else {
+                card.classList.remove('completed');
+            }
+        });
+    }
+
+    function openModal(subjectKey) {
+        const subject = subjectData[subjectKey];
+        const modalBody = document.getElementById('modal-body');
+        let content = `<h2 class="tv-text-4xl font-bold text-center mb-8">${subject.title}</h2>`;
+        
+        subject.activities.forEach(activity => {
+            const activityProgress = progressData[subjectKey]?.[activity.title] || {};
+            const isCompleted = activityProgress.completed;
+            content += `<div class="bg-gray-100 p-6 rounded-2xl mb-8 ${isCompleted ? 'border-4 border-green-500' : ''}">`;
+            content += `<h3 class="tv-text-2xl font-bold mb-4">${activity.title} ${isCompleted ? '✅' : ''}</h3>`;
+
+            switch (activity.type) {
+                case 'quiz':
+                    content += `<p class="tv-text-xl mb-4">${activity.instructions}</p>`;
+                    activity.questions.forEach((q, index) => {
+                        const uniqueId = `${subjectKey}-${activity.title.replace(/\s/g, '')}-${index}`;
+                        content += `<div class="mb-4 p-4 bg-white rounded-lg shadow-sm" id="${uniqueId}">`;
+                        content += `<p class="tv-text-2xl font-bold mb-3">${q.q}</p>`;
+                        content += `<div class="grid grid-cols-1 gap-3">`;
+                        q.options.forEach(opt => {
+                            content += `<button onclick="window.checkAnswer(this, '${opt.replace(/'/g, "\\'")}', '${q.a.replace(/'/g, "\\'")}', '${uniqueId}', '${subjectKey}', '${activity.title}')" class="w-full text-left p-4 tv-text-xl bg-sky-200 hover:bg-sky-300 text-sky-800 font-bold rounded-lg transition">${opt}</button>`;
+                        });
+                        content += `</div></div>`;
+                    });
+                    break;
+                 case 'math_quiz':
+                     content += `<div class="text-center" id="math-game">
+                        <p class="tv-text-4xl mb-6"><span id="num1"></span> ${activity.operator} <span id="num2"></span> = ?</p>
+                        <input type="number" id="math-answer" class="tv-text-3xl p-4 border-4 border-gray-300 rounded-lg text-center w-48">
+                        <button id="check-math" class="ml-4 tv-text-2xl bg-green-500 hover:bg-green-600 text-white font-bold py-4 px-8 rounded-lg">Check</button>
+                        <p id="math-feedback" class="mt-6 tv-text-2xl font-bold h-8"></p>
+                     </div>`;
+                     setTimeout(() => setupMathGame(activity.operator, activity.range, subjectKey, activity.title), 0);
+                     break;
+                case 'map':
+                     content += `<p class="tv-text-xl text-center mb-4">${activity.instructions}</p>
+                        <div class="p-4 rounded-lg flex flex-col items-center gap-6">
+                           <button class="p-5 tv-text-xl bg-red-500 text-white rounded-lg shadow-lg w-1/2" onclick="alert('Columbia is the state capital!')">Columbia</button>
+                           <button class="p-5 tv-text-xl bg-blue-500 text-white rounded-lg shadow-lg w-1/2" onclick="alert('Charleston is a beautiful city on the coast!')">Charleston</button>
+                           <button class="p-5 tv-text-xl bg-green-500 text-white rounded-lg shadow-lg w-1/2" onclick="alert('Greenville is in the foothills of the mountains!')">Greenville</button>
+                        </div>`;
+                     setTimeout(() => saveProgress(subjectKey, activity.title, { completed: true }), 100);
+                     break;
+
+            }
+            content += `</div>`;
+        });
+        modalBody.innerHTML = content;
+        document.getElementById('activity-modal').style.display = 'flex';
+    }
+    
+    // --- Global Interactive Functions ---
+    window.checkAnswer = (button, selectedAnswer, correctAnswer, quizId, subjectKey, activityTitle) => {
+        const parent = document.getElementById(quizId);
+        const buttons = parent.querySelectorAll('button');
+        buttons.forEach(b => b.disabled = true);
+
+        if (selectedAnswer === correctAnswer) {
+            button.classList.remove('bg-sky-200');
+            button.classList.add('bg-green-500', 'text-white');
+        } else {
+            button.classList.remove('bg-sky-200');
+            button.classList.add('bg-red-500', 'text-white');
+        }
+        
+        const allQuizParents = Array.from(document.querySelectorAll(`[id^="${subjectKey}-${activityTitle.replace(/\s/g, '')}"]`));
+        const allAnswered = allQuizParents.every(p => p.querySelector('button:disabled'));
+        if(allAnswered) {
+            const correctCount = allQuizParents.filter(p => p.querySelector('.bg-green-500')).length;
+            saveProgress(subjectKey, activityTitle, { completed: true, score: correctCount, total: allQuizParents.length });
+        }
+    };
+    
+    function setupMathGame(operator, range, subjectKey, activityTitle) {
+        const num1El = document.getElementById('num1');
+        const num2El = document.getElementById('num2');
+        const answerEl = document.getElementById('math-answer');
+        const checkBtn = document.getElementById('check-math');
+        const feedbackEl = document.getElementById('math-feedback');
+        let correctInARow = 0;
+
+        const newProblem = () => {
+            let n1 = Math.floor(Math.random() * range) + 1;
+            let n2 = Math.floor(Math.random() * range) + 1;
+            if (operator === '-' && n1 < n2) [n1, n2] = [n2, n1];
+            num1El.textContent = n1;
+            num2El.textContent = n2;
+            answerEl.value = '';
+            feedbackEl.textContent = '';
+            answerEl.focus();
         };
         
-        function setupMathGame(operator, range, subjectKey, activityTitle) {
-            const num1El = document.getElementById('num1');
-            const num2El = document.getElementById('num2');
-            const answerEl = document.getElementById('math-answer');
-            const checkBtn = document.getElementById('check-math');
-            const feedbackEl = document.getElementById('math-feedback');
-            let correctInARow = 0;
-
-            const newProblem = () => {
-                let n1 = Math.floor(Math.random() * range) + 1;
-                let n2 = Math.floor(Math.random() * range) + 1;
-                if (operator === '-' && n1 < n2) [n1, n2] = [n2, n1];
-                num1El.textContent = n1;
-                num2El.textContent = n2;
-                answerEl.value = '';
-                feedbackEl.textContent = '';
-                answerEl.focus();
-            };
+        checkBtn.addEventListener('click', () => {
+            const n1 = parseInt(num1El.textContent), n2 = parseInt(num2El.textContent);
+            const userAnswer = parseInt(answerEl.value);
+            const correctAnswer = (operator === '+') ? n1 + n2 : n1 - n2;
             
-            checkBtn.addEventListener('click', () => {
-                const n1 = parseInt(num1El.textContent), n2 = parseInt(num2El.textContent);
-                const userAnswer = parseInt(answerEl.value);
-                const correctAnswer = (operator === '+') ? n1 + n2 : n1 - n2;
-                
-                if(userAnswer === correctAnswer) {
-                    feedbackEl.textContent = "Correct! ✨";
-                    feedbackEl.className = 'mt-6 tv-text-2xl font-bold text-green-500';
-                    correctInARow++;
-                    if(correctInARow >= 5) {
-                        saveProgress(subjectKey, activityTitle, { completed: true, score: 5, total: 5 });
-                        feedbackEl.textContent = "Wow! 5 in a row! Activity Complete!";
-                    }
-                    setTimeout(newProblem, 1500);
-                } else {
-                    feedbackEl.textContent = "Try again!";
-                    feedbackEl.className = 'mt-6 tv-text-2xl font-bold text-red-500';
-                    correctInARow = 0;
+            if(userAnswer === correctAnswer) {
+                feedbackEl.textContent = "Correct! ✨";
+                feedbackEl.className = 'mt-6 tv-text-2xl font-bold text-green-500';
+                correctInARow++;
+                if(correctInARow >= 5) {
+                    saveProgress(subjectKey, activityTitle, { completed: true, score: 5, total: 5 });
+                    feedbackEl.textContent = "Wow! 5 in a row! Activity Complete!";
                 }
-            });
-            newProblem();
-        }
-
-        // --- Event Listeners ---
-        const modal = document.getElementById('activity-modal');
-        document.getElementById('reading-card').addEventListener('click', () => openModal('reading'));
-        document.getElementById('math-card').addEventListener('click', () => openModal('math'));
-        document.getElementById('science-card').addEventListener('click', () => openModal('science'));
-        document.getElementById('social-studies-card').addEventListener('click', () => openModal('social-studies'));
-        document.getElementById('close-modal').addEventListener('click', () => modal.style.display = 'none');
-        
-        // Keyboard nav for cards
-        document.querySelectorAll('.subject-card').forEach(card => {
-            card.addEventListener('keydown', (e) => {
-                if(e.key === 'Enter' || e.key === ' ') {
-                    card.click();
-                }
-            });
+                setTimeout(newProblem, 1500);
+            } else {
+                feedbackEl.textContent = "Try again!";
+                feedbackEl.className = 'mt-6 tv-text-2xl font-bold text-red-500';
+                correctInARow = 0;
+            }
         });
-        
-        // --- App Initialization ---
-        initializeFirebase();
+        newProblem();
+    }
 
-    </script>
-</body>
-</html>
+    // --- Event Listeners ---
+    const modal = document.getElementById('activity-modal');
+    document.getElementById('reading-card').addEventListener('click', () => openModal('reading'));
+    document.getElementById('math-card').addEventListener('click', () => openModal('math'));
+    document.getElementById('science-card').addEventListener('click', () => openModal('science'));
+    document.getElementById('social-studies-card').addEventListener('click', () => openModal('social-studies'));
+    document.getElementById('close-modal').addEventListener('click', () => modal.style.display = 'none');
+    
+    document.querySelectorAll('.subject-card').forEach(card => {
+        card.addEventListener('keydown', (e) => {
+            if(e.key === 'Enter' || e.key === ' ') {
+                card.click();
+            }
+        });
+    });
+</script>
 
 
