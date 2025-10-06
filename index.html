@@ -7,45 +7,65 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Comic+Neue:wght@400;700&display=swap" rel="stylesheet">
     <style>
-        body { font-family: 'Comic Neue', cursive; background-color: #FFFBEB; }
-        .subject-card:focus, button:focus, input:focus, [tabindex="0"]:focus { outline: none; box-shadow: 0 0 0 8px rgba(251, 191, 36, 0.7); transform: scale(1.05); }
+        body { font-family: 'Comic Neue', cursive; background-color: #FFFBEB; -webkit-touch-callout: none; -webkit-user-select: none; user-select: none; }
+        .subject-card:focus, button:focus, input:focus, [tabindex="0"]:focus { outline: none; box-shadow: 0 0 0 4px rgba(251, 191, 36, 0.7); }
         .activity-modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.6); animation: fadeIn 0.3s; }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-        .modal-content { animation: slideIn 0.3s; width: 90%; max-width: 1200px; }
+        .modal-content { animation: slideIn 0.3s; width: 95%; max-width: 1200px; }
         @keyframes slideIn { from { transform: translateY(-30px); opacity: 0; } to { translateY(0); opacity: 1; } }
-        .tv-text-xl { font-size: 1.75rem; line-height: 2.25rem; } .tv-text-2xl { font-size: 2.25rem; line-height: 2.5rem; } .tv-text-3xl { font-size: 3rem; line-height: 1; } .tv-text-4xl { font-size: 4rem; line-height: 1; } .tv-text-5xl { font-size: 5rem; line-height: 1; }
-        .completed-overlay { position: absolute; top: 0; left: 0; right: 0; bottom: 0; background-color: rgba(0,0,0,0.4); color: white; display: flex; align-items: center; justify-content: center; font-size: 6rem; border-radius: 1.5rem; opacity: 0; transition: opacity 0.3s; }
+        .completed-overlay { position: absolute; top: 0; left: 0; right: 0; bottom: 0; background-color: rgba(0,0,0,0.4); color: white; display: flex; align-items: center; justify-content: center; font-size: 4rem; border-radius: 1.5rem; opacity: 0; transition: opacity 0.3s; }
         .completed .completed-overlay { opacity: 1; }
-        .draggable { cursor: grab; }
+        .draggable { cursor: grab; touch-action: none; }
         .drop-zone { border: 4px dashed #ccc; transition: background-color 0.3s, border-color 0.3s; }
         .drop-zone.over { background-color: #e0f2fe; border-color: #38bdf8; }
         .math-bubble { position: absolute; bottom: -100px; animation: floatUp 10s linear infinite; }
         @keyframes floatUp { 0% { bottom: -100px; transform: translateX(0); } 100% { bottom: 100%; transform: translateX(20px); } }
+        
+        /* Mobile text sizes */
+        .text-header { font-size: 2.5rem; }
+        .text-subheader { font-size: 1.25rem; }
+        .text-section-header { font-size: 2rem; }
+        .text-card-header { font-size: 1.75rem; }
+        .text-body { font-size: 1.1rem; }
+        .text-game-header { font-size: 1.5rem; }
+        .text-game-body { font-size: 1.25rem; }
+
+        /* Larger screen text sizes */
+        @media (min-width: 640px) {
+            .text-header { font-size: 3.5rem; }
+            .text-subheader { font-size: 1.5rem; }
+            .text-section-header { font-size: 2.5rem; }
+            .text-card-header { font-size: 2rem; }
+            .text-body { font-size: 1.2rem; }
+            .text-game-header { font-size: 2rem; }
+            .text-game-body { font-size: 1.5rem; }
+        }
+        @media (min-width: 1024px) { .text-header { font-size: 5rem; } }
     </style>
 </head>
 <body class="text-gray-800">
 
-    <div id="auth-status" class="bg-indigo-600 text-white p-3 text-center text-xl">Loading...</div>
-    <header class="bg-sky-400 text-white p-8 text-center shadow-lg"><h1 class="tv-text-5xl font-bold">Layla's Homeschool Hub!</h1><p class="mt-4 tv-text-xl">South Carolina First Grade Adventures</p></header>
+    <div id="auth-status" class="bg-indigo-600 text-white p-2 text-center text-sm sm:text-lg">Loading...</div>
+    <header class="bg-sky-400 text-white p-6 text-center shadow-lg"><h1 class="text-header font-bold">Layla's Hub!</h1><p class="mt-2 text-subheader">First Grade Adventures</p></header>
 
-    <main class="container mx-auto p-8">
-        <div id="daily-schedule-container" class="bg-white p-6 rounded-2xl shadow-lg mb-12 border-4 border-amber-400">
-            <h2 class="tv-text-3xl font-bold text-amber-600 mb-4">Today's Plan!</h2>
-            <div id="daily-schedule-content" class="tv-text-xl text-gray-700 whitespace-pre-wrap">Loading today's lessons...</div>
+    <main class="container mx-auto p-4 sm:p-8">
+        <div id="daily-schedule-container" class="bg-white p-4 sm:p-6 rounded-2xl shadow-lg mb-8 sm:mb-12 border-4 border-amber-400">
+            <h2 class="text-section-header font-bold text-amber-600 mb-3">Today's Plan!</h2>
+            <div id="daily-schedule-content" class="text-body text-gray-700 whitespace-pre-wrap">Loading today's lessons...</div>
         </div>
 
-        <h2 class="tv-text-4xl text-center font-bold text-pink-500 mb-12">Choose a Subject!</h2>
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-12">
-            <div id="reading-card" tabindex="0" class="subject-card relative bg-rose-300 p-10 rounded-3xl shadow-xl text-center cursor-default transition-transform duration-300"><div class="text-8xl mb-6">📚</div><h3 class="tv-text-3xl font-bold text-white">Reading</h3><div class="completed-overlay">✅</div></div>
-            <div id="math-card" tabindex="0" class="subject-card relative bg-teal-300 p-10 rounded-3xl shadow-xl text-center cursor-default transition-transform duration-300"><div class="text-8xl mb-6">🧮</div><h3 class="tv-text-3xl font-bold text-white">Math</h3><div class="completed-overlay">✅</div></div>
-            <div id="science-card" tabindex="0" class="subject-card relative bg-lime-400 p-10 rounded-3xl shadow-xl text-center cursor-default transition-transform duration-300"><div class="text-8xl mb-6">🔬</div><h3 class="tv-text-3xl font-bold text-white">Science</h3><div class="completed-overlay">✅</div></div>
-            <div id="social-studies-card" tabindex="0" class="subject-card relative bg-orange-400 p-10 rounded-3xl shadow-xl text-center cursor-default transition-transform duration-300"><div class="text-8xl mb-6">🗺️</div><h3 class="tv-text-3xl font-bold text-white">Social Studies</h3><div class="completed-overlay">✅</div></div>
+        <h2 class="text-section-header text-center font-bold text-pink-500 mb-8">Choose a Subject!</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-12">
+            <div id="reading-card" tabindex="0" class="subject-card relative bg-rose-300 p-6 rounded-3xl shadow-xl text-center cursor-default transition-transform duration-300"><div class="text-6xl sm:text-8xl mb-4">📚</div><h3 class="text-card-header font-bold text-white">Reading</h3><div class="completed-overlay">✅</div></div>
+            <div id="math-card" tabindex="0" class="subject-card relative bg-teal-300 p-6 rounded-3xl shadow-xl text-center cursor-default transition-transform duration-300"><div class="text-6xl sm:text-8xl mb-4">🧮</div><h3 class="text-card-header font-bold text-white">Math</h3><div class="completed-overlay">✅</div></div>
+            <div id="science-card" tabindex="0" class="subject-card relative bg-lime-400 p-6 rounded-3xl shadow-xl text-center cursor-default transition-transform duration-300"><div class="text-6xl sm:text-8xl mb-4">🔬</div><h3 class="text-card-header font-bold text-white">Science</h3><div class="completed-overlay">✅</div></div>
+            <div id="social-studies-card" tabindex="0" class="subject-card relative bg-orange-400 p-6 rounded-3xl shadow-xl text-center cursor-default transition-transform duration-300"><div class="text-6xl sm:text-8xl mb-4">🗺️</div><h3 class="text-card-header font-bold text-white">Social Studies</h3><div class="completed-overlay">✅</div></div>
         </div>
     </main>
 
-    <div id="activity-modal" class="activity-modal items-center justify-center"><div class="modal-content bg-white p-12 rounded-3xl shadow-xl relative"><button id="close-modal" class="absolute top-6 right-6 text-6xl font-bold text-gray-500 hover:text-gray-800 transition">&times;</button><div id="modal-body"></div></div></div>
+    <div id="activity-modal" class="activity-modal items-center justify-center p-2"><div class="modal-content bg-white p-4 sm:p-8 rounded-3xl shadow-xl relative"><button id="close-modal" class="absolute top-2 right-3 text-4xl sm:text-6xl font-bold text-gray-500 hover:text-gray-800 transition">&times;</button><div id="modal-body"></div></div></div>
 
-    <footer class="text-center p-6 mt-8">
+    <footer class="text-center p-6 mt-4">
         <a href="./parent-dashboard.html" class="text-gray-500 hover:text-indigo-600 transition">Parent Dashboard</a>
     </footer>
 
@@ -58,39 +78,15 @@
         let db, auth, userId, appId;
         let progressData = {};
         const subjectData = {
-            reading: {
-                title: 'Reading Games!',
-                activities: [
-                    { title: 'Rhyme Matching', type: 'drag_rhyme', mainItem: { word: 'cat', emoji: '🐱' }, options: [{ word: 'dog', emoji: '🐶' }, { word: 'hat', emoji: '👒' }, { word: 'sun', emoji: '☀️' }], answer: 'hat' },
-                    { title: 'Sight Word Typing', type: 'typing_game', words: ['the', 'and', 'see', 'you', 'run'] }
-                ]
-            },
-            math: {
-                title: 'Math Games!',
-                activities: [
-                    { title: 'Addition Bubbles', type: 'math_bubbles', operator: '+', range: 10 }
-                ]
-            },
-            science: {
-                title: 'Science Games!',
-                activities: [
-                    { title: 'Label the Animal', type: 'drag_label', image: 'https://placehold.co/600x400/A7F3D0/4A5568?text=Friendly+Animal', labels: [{ name: 'Head', pos: {top: '10%', left: '45%'} }, { name: 'Tail', pos: {top: '55%', left: '85%'} }, { name: 'Legs', pos: {top: '80%', left: '40%'} }] }
-                ]
-            },
-            'social-studies': {
-                title: 'Social Studies Games!',
-                activities: [
-                    { title: 'Community Helpers Match', type: 'picture_match', prompt: 'Who helps us when we are sick?', options: [{ name: 'Firefighter', emoji: '👩‍🚒' }, { name: 'Doctor', emoji: '👩‍⚕️' }, { name: 'Teacher', emoji: '👩‍🏫' }], answer: 'Doctor' }
-                ]
-            }
+             reading: { title: 'Reading Games!', activities: [ { title: 'Rhyme Matching', type: 'drag_rhyme', mainItem: { word: 'cat', emoji: '🐱' }, options: [{ word: 'dog', emoji: '🐶' }, { word: 'hat', emoji: '👒' }, { word: 'sun', emoji: '☀️' }], answer: 'hat' }, { title: 'Sight Word Typing', type: 'typing_game', words: ['the', 'and', 'see', 'you', 'run'] } ] }, math: { title: 'Math Games!', activities: [ { title: 'Addition Bubbles', type: 'math_bubbles', operator: '+', range: 10 } ] }, science: { title: 'Science Games!', activities: [ { title: 'Label the Animal', type: 'drag_label', image: 'https://placehold.co/600x400/A7F3D0/4A5568?text=Friendly+Animal', labels: [{ name: 'Head', pos: {top: '10%', left: '45%'} }, { name: 'Tail', pos: {top: '55%', left: '85%'} }, { name: 'Legs', pos: {top: '80%', left: '40%'} }] } ] }, 'social-studies': { title: 'Social Studies Games!', activities: [ { title: 'Community Helpers Match', type: 'picture_match', prompt: 'Who helps us when we are sick?', options: [{ name: 'Firefighter', emoji: '👩‍🚒' }, { name: 'Doctor', emoji: '👩‍⚕️' }, { name: 'Teacher', emoji: '👩‍🏫' }], answer: 'Doctor' } ] }
         };
 
-        // --- Firebase Configuration ---
+        // --- Firebase Configuration & Initialization ---
         const firebaseConfig = { apiKey: "AIzaSyAfatIGx88HP1fH0_EGTr_zHpvNa1Rcg7k", authDomain: "laylahomeschool-77ac4.firebaseapp.com", projectId: "laylahomeschool-77ac4", storageBucket: "laylahomeschool-77ac4.firebasestorage.app", messagingSenderId: "491842629315", appId: "1:491842629315:web:8644c66d1cde1b734fbc76" };
         appId = "laylahomeschool-77ac4";
-
-        // --- Firebase Initialization & Functions ---
-        try { const app = initializeApp(firebaseConfig); db = getFirestore(app); auth = getAuth(app); onAuthStateChanged(auth, async (user) => { if (user) { userId = user.uid; document.getElementById('auth-status').innerHTML = `<p>Welcome Layla! | Tracking ID: <span class="font-bold">${userId}</span></p>`; await loadProgress(); await loadDailySchedule(); } else { await signInAnonymously(auth); } }); } catch (error) { console.error("Firebase initialization failed:", error); document.getElementById('auth-status').innerText = "Could not connect to progress tracking."; }
+        try { const app = initializeApp(firebaseConfig); db = getFirestore(app); auth = getAuth(app); onAuthStateChanged(auth, async (user) => { if (user) { userId = user.uid; document.getElementById('auth-status').innerHTML = `<p>Welcome Layla! | Tracking ID: <span class="font-bold">${userId.substring(0,8)}...</span></p>`; await loadProgress(); await loadDailySchedule(); } else { await signInAnonymously(auth); } }); } catch (error) { console.error("Firebase initialization failed:", error); document.getElementById('auth-status').innerText = "Could not connect."; }
+        
+        // --- Data Loading Functions ---
         async function loadDailySchedule() { const el = document.getElementById('daily-schedule-content'); const days = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"]; const today = days[new Date().getDay()]; const ref = doc(db, `artifacts/${appId}/users/${userId}/schedule`, 'weekly'); const snap = await getDoc(ref); if (snap.exists()) { const plan = snap.data()[today]; el.textContent = plan || `No lessons planned for today. Enjoy your day!`; } else { el.textContent = `No schedule has been set up yet.`; } }
         async function saveProgress(subject, activityTitle, data) { if (!userId) return; progressData[subject] = progressData[subject] || {}; progressData[subject][activityTitle] = data; const ref = doc(db, `artifacts/${appId}/users/${userId}/progress`, subject); try { await setDoc(ref, { [activityTitle]: data }, { merge: true }); updateDashboard(); } catch(e) { console.error("Error saving progress: ", e); } }
         async function loadProgress() { if (!userId) return; const subjects = Object.keys(subjectData); for (const subject of subjects) { const ref = doc(db, `artifacts/${appId}/users/${userId}/progress`, subject); const snap = await getDoc(ref); if (snap.exists()) { progressData[subject] = { ...progressData[subject], ...snap.data() }; } } updateDashboard(); }
@@ -101,50 +97,17 @@
         function openModal(subjectKey) {
             const subject = subjectData[subjectKey];
             const modalBody = document.getElementById('modal-body');
-            let content = `<h2 class="tv-text-4xl font-bold text-center mb-8">${subject.title}</h2>`;
+            let content = `<h2 class="text-game-header font-bold text-center mb-6">${subject.title}</h2>`;
             subject.activities.forEach(activity => {
                 const isCompleted = progressData[subjectKey]?.[activity.title]?.completed;
-                content += `<div class="bg-gray-100 p-6 rounded-2xl mb-8 ${isCompleted ? 'border-4 border-green-500' : ''}" id="activity-${activity.title.replace(/\s/g, '')}">
-                                <h3 class="tv-text-2xl font-bold mb-4">${activity.title} ${isCompleted ? '✅' : ''}</h3>`;
+                content += `<div class="bg-gray-100 p-4 rounded-2xl mb-6 ${isCompleted ? 'border-4 border-green-500' : ''}" id="activity-${activity.title.replace(/\s/g, '')}">
+                                <h3 class="text-game-body font-bold mb-4">${activity.title} ${isCompleted ? '✅' : ''}</h3>`;
                 
                 switch(activity.type) {
-                    case 'drag_rhyme':
-                        content += `<div class="text-center"><p class="tv-text-xl mb-4">Drag the rhyming word to the box!</p>
-                            <div class="flex items-center justify-center gap-8 mb-8">
-                                <div class="text-center"><div class="text-8xl">${activity.mainItem.emoji}</div><p class="tv-text-2xl font-bold">${activity.mainItem.word}</p></div>
-                                <div id="rhyme-drop-zone" data-answer="${activity.answer}" class="drop-zone w-48 h-48 rounded-2xl flex items-center justify-center"></div>
-                            </div>
-                            <div class="flex justify-center gap-4">${activity.options.map((opt, i) => `<div id="rhyme-drag-${i}" draggable="true" data-word="${opt.word}" class="draggable text-center p-4 bg-yellow-200 rounded-lg"><div class="text-6xl">${opt.emoji}</div><p class="tv-text-xl">${opt.word}</p></div>`).join('')}</div>
-                        </div>`;
-                        setTimeout(() => setupDragDrop('rhyme', subjectKey, activity.title), 0);
-                        break;
-                    case 'math_bubbles':
-                         content += `<div class="text-center h-96 relative overflow-hidden" id="bubble-container">
-                                        <p class="tv-text-3xl font-bold mb-4">Pop the bubble with the right answer!</p>
-                                        <p class="tv-text-5xl font-bold" id="math-problem"></p>
-                                    </div>`;
-                        setTimeout(() => setupMathBubbles(subjectKey, activity.title, activity.operator, activity.range), 0);
-                        break;
-                    case 'drag_label':
-                        content += `<div class="relative w-full h-[500px]">
-                            <img src="${activity.image}" class="w-full h-full object-contain">
-                            ${activity.labels.map(l => `<div class="drop-zone absolute w-32 h-16 rounded-lg" data-answer="${l.name}" style="top:${l.pos.top}; left:${l.pos.left};"></div>`).join('')}
-                            <div class="absolute bottom-0 w-full flex justify-center gap-4">
-                                ${activity.labels.map((l, i) => `<div id="label-drag-${i}" draggable="true" data-word="${l.name}" class="draggable tv-text-2xl font-bold p-4 bg-sky-200 rounded-lg">${l.name}</div>`).join('')}
-                            </div>
-                        </div>`;
-                        setTimeout(() => setupDragDrop('label', subjectKey, activity.title), 0);
-                        break;
-                    case 'picture_match':
-                        content += `<p class="tv-text-2xl text-center mb-6">${activity.prompt}</p>
-                        <div class="flex justify-around">
-                        ${activity.options.map(opt => `<button data-name="${opt.name}" class="picture-option text-center p-4 rounded-2xl hover:bg-amber-200 transition">
-                            <div class="text-8xl">${opt.emoji}</div>
-                            <p class="tv-text-2xl mt-2">${opt.name}</p>
-                        </button>`).join('')}
-                        </div>`;
-                        setTimeout(() => setupPictureMatch(subjectKey, activity.title, activity.answer), 0);
-                        break;
+                    case 'drag_rhyme': content += `<div class="text-center"><p class="text-body mb-4">Drag the rhyming word to the box!</p><div class="flex flex-col sm:flex-row items-center justify-center gap-4 sm:gap-8 mb-6"><div class="text-center"><div class="text-6xl sm:text-8xl">${activity.mainItem.emoji}</div><p class="text-game-body font-bold">${activity.mainItem.word}</p></div><div id="rhyme-drop-zone" data-answer="${activity.answer}" class="drop-zone w-32 h-32 sm:w-48 sm:h-48 rounded-2xl flex items-center justify-center"></div></div><div class="flex justify-center gap-4">${activity.options.map((opt, i) => `<div id="rhyme-drag-${i}" draggable="true" data-word="${opt.word}" class="draggable text-center p-2 sm:p-4 bg-yellow-200 rounded-lg"><div class="text-5xl sm:text-6xl">${opt.emoji}</div><p class="text-body">${opt.word}</p></div>`).join('')}</div></div>`; setTimeout(() => setupDragDrop(), 0); break;
+                    case 'math_bubbles': content += `<div class="text-center h-96 relative overflow-hidden rounded-lg bg-sky-200" id="bubble-container"><p class="text-game-body font-bold pt-4">Pop the bubble with the right answer!</p><p class="text-header font-bold" id="math-problem"></p></div>`; setTimeout(() => setupMathBubbles(subjectKey, activity.title, activity.operator, activity.range), 0); break;
+                    case 'drag_label': content += `<div class="relative w-full max-w-lg mx-auto aspect-video"><img src="${activity.image}" class="w-full h-full object-contain">${activity.labels.map(l => `<div class="drop-zone absolute w-24 h-12 rounded-lg" data-answer="${l.name}" style="top:${l.pos.top}; left:${l.pos.left};"></div>`).join('')}</div><div class="mt-4 w-full flex justify-center flex-wrap gap-3">${activity.labels.map((l, i) => `<div id="label-drag-${i}" draggable="true" data-word="${l.name}" class="draggable text-game-body font-bold p-3 bg-sky-200 rounded-lg">${l.name}</div>`).join('')}</div>`; setTimeout(() => setupDragDrop(), 0); break;
+                    case 'picture_match': content += `<p class="text-game-body text-center mb-4">${activity.prompt}</p><div class="flex justify-around">${activity.options.map(opt => `<button data-name="${opt.name}" class="picture-option text-center p-3 rounded-2xl hover:bg-amber-200 transition"><div class="text-6xl sm:text-8xl">${opt.emoji}</div><p class="text-game-body mt-2">${opt.name}</p></button>`).join('')}</div>`; setTimeout(() => setupPictureMatch(subjectKey, activity.title, activity.answer), 0); break;
                 }
                 content += `</div>`;
             });
@@ -152,102 +115,85 @@
             document.getElementById('activity-modal').style.display = 'flex';
         }
 
-        function setupDragDrop(type, subject, title) {
+        // --- MOBILE DRAG & DROP ---
+        function setupDragDrop() {
             const draggables = document.querySelectorAll('.draggable');
-            const dropZones = document.querySelectorAll('.drop-zone');
-            let correctDrops = 0;
-            const totalDrops = dropZones.length;
+            let draggedItem = null;
+            let initialX, initialY;
 
             draggables.forEach(draggable => {
-                draggable.addEventListener('dragstart', e => {
-                    e.dataTransfer.setData('text/plain', e.target.dataset.word);
+                // Mouse Events
+                draggable.addEventListener('dragstart', e => { e.dataTransfer.setData('text/plain', e.target.dataset.word); });
+                // Touch Events
+                draggable.addEventListener('touchstart', e => {
+                    draggedItem = e.target.closest('.draggable');
+                    draggedItem.style.zIndex = 1000;
+                    const touch = e.touches[0];
+                    initialX = touch.clientX - draggedItem.getBoundingClientRect().left;
+                    initialY = touch.clientY - draggedItem.getBoundingClientRect().top;
+                }, { passive: true });
+
+                document.addEventListener('touchmove', e => {
+                    if (!draggedItem) return;
+                    e.preventDefault();
+                    const touch = e.touches[0];
+                    draggedItem.style.position = 'absolute';
+                    draggedItem.style.left = `${touch.clientX - initialX}px`;
+                    draggedItem.style.top = `${touch.clientY - initialY}px`;
+                }, { passive: false });
+
+                document.addEventListener('touchend', e => {
+                    if (!draggedItem) return;
+                    const touch = e.changedTouches[0];
+                    const dropZone = document.elementFromPoint(touch.clientX, touch.clientY)?.closest('.drop-zone');
+                    if (dropZone) {
+                        handleDrop(draggedItem.dataset.word, dropZone);
+                    }
+                    draggedItem.style.position = '';
+                    draggedItem.style.left = '';
+                    draggedItem.style.top = '';
+                    draggedItem.style.zIndex = '';
+                    draggedItem = null;
                 });
             });
 
-            dropZones.forEach(zone => {
+            document.querySelectorAll('.drop-zone').forEach(zone => {
                 zone.addEventListener('dragover', e => { e.preventDefault(); zone.classList.add('over'); });
                 zone.addEventListener('dragleave', () => zone.classList.remove('over'));
                 zone.addEventListener('drop', e => {
                     e.preventDefault();
                     zone.classList.remove('over');
                     const droppedWord = e.dataTransfer.getData('text');
-                    if (droppedWord === zone.dataset.answer) {
-                        const droppedEl = Array.from(draggables).find(d => d.dataset.word === droppedWord);
-                        zone.innerHTML = droppedEl.innerHTML;
-                        zone.style.borderColor = 'rgb(34 197 94)';
-                        droppedEl.style.display = 'none';
-                        correctDrops++;
-                        if (correctDrops === totalDrops) {
-                           saveProgress(subject, title, { completed: true });
-                           document.getElementById(`activity-${title.replace(/\s/g, '')}`).classList.add('border-4', 'border-green-500');
-                        }
-                    } else {
-                        zone.style.borderColor = 'rgb(239 68 68)';
-                        setTimeout(() => zone.style.borderColor = '', 1000);
-                    }
+                    handleDrop(droppedWord, zone);
                 });
             });
         }
         
-        function setupMathBubbles(subject, title, operator, range) {
-            const container = document.getElementById('bubble-container');
-            const problemEl = document.getElementById('math-problem');
-            let correctAnswer;
-            let correctPops = 0;
+        function handleDrop(droppedWord, zone) {
+            const allDraggables = document.querySelectorAll('.draggable');
+            const subject = document.querySelector('.modal-content h2').textContent.replace(' Games!', '').toLowerCase().replace(' ', '-');
+            const activityTitle = zone.closest('[id^="activity-"]').querySelector('h3').textContent.split(' ✅')[0].trim();
+            
+            if (droppedWord === zone.dataset.answer) {
+                const droppedEl = Array.from(allDraggables).find(d => d.dataset.word === droppedWord);
+                zone.innerHTML = droppedEl.innerHTML;
+                zone.style.borderColor = 'rgb(34 197 94)';
+                droppedEl.style.display = 'none';
 
-            function newProblem() {
-                if(correctPops >= 5) {
-                    problemEl.textContent = 'You did it! 🎉';
-                    container.innerHTML = `<p class="tv-text-5xl font-bold text-center mt-16">Great Job! 🎉</p>`;
-                    saveProgress(subject, title, { completed: true, score: 5 });
-                    document.getElementById(`activity-${title.replace(/\s/g, '')}`).classList.add('border-4', 'border-green-500');
-                    return;
+                const allZones = zone.parentElement.querySelectorAll('.drop-zone');
+                const correctDrops = Array.from(allZones).filter(z => z.style.borderColor === 'rgb(34 197 94)').length;
+                if (correctDrops === allZones.length) {
+                   saveProgress(subject, activityTitle, { completed: true });
+                   document.getElementById(`activity-${activityTitle.replace(/\s/g, '')}`).classList.add('border-4', 'border-green-500');
                 }
-                const n1 = Math.floor(Math.random() * range) + 1;
-                const n2 = Math.floor(Math.random() * range) + 1;
-                correctAnswer = n1 + n2;
-                problemEl.textContent = `${n1} + ${n2} = ?`;
+            } else {
+                zone.style.borderColor = 'rgb(239 68 68)';
+                setTimeout(() => { zone.style.borderColor = '' }, 1000);
             }
-
-            setInterval(() => {
-                const bubble = document.createElement('div');
-                const isCorrect = Math.random() > 0.6; // 40% chance of being correct
-                const number = isCorrect ? correctAnswer : Math.floor(Math.random() * (range * 2));
-                bubble.textContent = number;
-                bubble.className = 'math-bubble tv-text-4xl font-bold bg-cyan-300 w-24 h-24 rounded-full flex items-center justify-center cursor-pointer';
-                bubble.style.left = `${Math.random() * 85}%`;
-                bubble.style.animationDuration = `${Math.random() * 5 + 5}s`;
-                bubble.addEventListener('click', () => {
-                    if (parseInt(bubble.textContent) === correctAnswer) {
-                        bubble.style.display = 'none';
-                        correctPops++;
-                        newProblem();
-                    } else {
-                        bubble.style.backgroundColor = 'rgb(239 68 68)';
-                    }
-                }, { once: true });
-                container.appendChild(bubble);
-                setTimeout(() => bubble.remove(), 10000);
-            }, 1500);
-
-            newProblem();
         }
 
-        function setupPictureMatch(subject, title, answer) {
-            const options = document.querySelectorAll('.picture-option');
-            options.forEach(opt => {
-                opt.addEventListener('click', () => {
-                    options.forEach(o => o.disabled = true);
-                    if(opt.dataset.name === answer) {
-                        opt.classList.add('bg-green-300');
-                        saveProgress(subject, title, { completed: true });
-                        document.getElementById(`activity-${title.replace(/\s/g, '')}`).classList.add('border-4', 'border-green-500');
-                    } else {
-                        opt.classList.add('bg-red-300');
-                    }
-                });
-            });
-        }
+        function setupMathBubbles(subject, title, operator, range) { /* Unchanged */ const container = document.getElementById('bubble-container'); const problemEl = document.getElementById('math-problem'); let correctAnswer; let correctPops = 0; function newProblem() { if(correctPops >= 5) { container.innerHTML = `<p class="text-header font-bold text-center mt-16">Great Job! 🎉</p>`; saveProgress(subject, title, { completed: true, score: 5 }); document.getElementById(`activity-${title.replace(/\s/g, '')}`).classList.add('border-4', 'border-green-500'); return; } const n1 = Math.floor(Math.random() * range) + 1; const n2 = Math.floor(Math.random() * range) + 1; correctAnswer = n1 + n2; problemEl.textContent = `${n1} + ${n2} = ?`; } let intervalId = setInterval(() => { const bubble = document.createElement('div'); const isCorrect = Math.random() > 0.6; const number = isCorrect ? correctAnswer : Math.floor(Math.random() * (range * 2)); bubble.textContent = number; bubble.className = 'math-bubble text-game-body font-bold bg-cyan-300 w-16 h-16 sm:w-24 sm:h-24 rounded-full flex items-center justify-center cursor-pointer'; bubble.style.left = `${Math.random() * 85}%`; bubble.style.animationDuration = `${Math.random() * 5 + 5}s`; bubble.addEventListener('click', () => { if (parseInt(bubble.textContent) === correctAnswer) { bubble.remove(); correctPops++; newProblem(); } else { bubble.style.backgroundColor = 'rgb(239 68 68)'; } }, { once: true }); container.appendChild(bubble); setTimeout(() => bubble.remove(), 10000); }, 1500); document.getElementById('close-modal').addEventListener('click', () => clearInterval(intervalId), {once: true}); newProblem(); }
+        function setupPictureMatch(subject, title, answer) { /* Unchanged */ const options = document.querySelectorAll('.picture-option'); options.forEach(opt => { opt.addEventListener('click', () => { options.forEach(o => o.disabled = true); if(opt.dataset.name === answer) { opt.classList.add('bg-green-300'); saveProgress(subject, title, { completed: true }); document.getElementById(`activity-${title.replace(/\s/g, '')}`).classList.add('border-4', 'border-green-500'); } else { opt.classList.add('bg-red-300'); } }); }); }
 
         // --- Event Listeners ---
         const modal = document.getElementById('activity-modal');
